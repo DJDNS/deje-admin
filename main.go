@@ -19,7 +19,6 @@ func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
 	}
 
 	doc := c.GetDocument(*location)
-	//length := strconv.FormatUint(uint64(doc.Events.Length()), 10)
 	r.HTML(200, "console", doc)
 }
 
