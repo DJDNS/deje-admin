@@ -27,5 +27,5 @@ func get_location(r *http.Request) (*model.IRCLocation, error) {
 		Channel: get_form(r, "channel"),
 	}
 
-    return location, nil
+	return location, nil
 }
