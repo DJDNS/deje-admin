@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/campadrenalin/go-deje"
 	"github.com/codegangsta/martini"
-	"github.com/codegangsta/martini-contrib/render"
+	"github.com/martini-contrib/render"
 	"net/http"
 	"strconv"
 )
