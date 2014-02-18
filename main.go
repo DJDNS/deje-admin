@@ -5,22 +5,22 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/martini-contrib/render"
 	"net/http"
-	"strconv"
 )
 
 func do_home(r render.Render) {
 	r.HTML(200, "root", nil)
 }
 
-func do_open(r *http.Request, c *deje.DEJEController) (int, string) {
-	location, err := get_location(r)
+func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
+	location, err := get_location(req)
 	if err != nil {
-		return 500, err.Error()
+		r.HTML(500, "error", err)
+		return
 	}
 
 	doc := c.GetDocument(*location)
-	length := strconv.FormatUint(uint64(doc.Events.Length()), 10)
-	return 200, length
+	//length := strconv.FormatUint(uint64(doc.Events.Length()), 10)
+	r.HTML(200, "console", doc)
 }
 
 func main() {

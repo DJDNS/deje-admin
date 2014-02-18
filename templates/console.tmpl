@@ -1,0 +1,17 @@
+<h1>Admin Console</h1>
+<table>
+    <thead>
+        <tr>
+            <td>Location</td>
+            <td>Num. Events</td>
+            <td>Num. Timestamps</td>
+            <td>Num. Quorums</td>
+        </tr>
+    </thead>
+    <tr>
+        <td>{{ .Channel }}</td>
+        <td>{{ .Events.Length }}</td>
+        <td>{{ .Timestamps.Length }}</td>
+        <td>{{ .Quorums.Length }}</td>
+    </tr>
+</table>
