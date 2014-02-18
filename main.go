@@ -22,15 +22,22 @@ func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
 	r.HTML(200, "console", doc)
 }
 
+func do_notfound(r render.Render) {
+	r.HTML(404, "404", nil)
+}
+
 func main() {
 	controller := deje.NewDEJEController()
 	m := martini.Classic()
 	m.Map(controller)
+	m.Use(martini.Static("static"))
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
 	}))
 
 	m.Get("/", do_home)
 	m.Get("/open", do_open)
+	m.NotFound(do_notfound)
+
 	m.Run()
 }

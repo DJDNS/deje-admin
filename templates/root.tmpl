@@ -1,8 +1,28 @@
 <h1>DEJE Admin Interface</h1>
-Open document by IRC location:
-<form action="/open" method="get">
-    <label>IRC server host<input name="host"/></label><br/>
-    <label>IRC server port<input name="port"/></label><br/>
-    <label>#channel<input name="channel"/></label><br/>
-    <input type="submit"/>
+<p>Open document by IRC location:</p>
+
+<form class="form-horizontal" role="form" action="/open" method="get">
+    <div class="form-group">
+        <label for="inputServerHost" class="col-sm-2 control-label">IRC Server</label>
+        <div class="col-sm-10">
+            <input name="host" class="form-control" id="inputServerHost" placeholder="irc.example.com"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputServerPort" class="col-sm-2 control-label">IRC Port</label>
+        <div class="col-sm-10">
+            <input name="port" class="form-control" id="inputServerPort" value="6667"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputChannel" class="col-sm-2 control-label">IRC Channel</label>
+        <div class="col-sm-10">
+            <input name="channel" class="form-control" id="inputChannel" placeholder="example"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Open Document</button>
+        </div>
+    </div>
 </form>
