@@ -15,3 +15,38 @@
         <td>{{ .Quorums.Length }}</td>
     </tr>
 </table>
+
+<h3>IRC log</h3>
+<pre class="pre-scrollable">
+placeholder: Thing someone said
+&gt;&gt; Thing this server said
+</pre>
+
+<h3>Current value</h3>
+<ul>
+    <li>
+        <code>"paxos"</code> : <code>{...}</code>
+        <ul>
+            <li>
+                <code>"acceptors"</code> : <code>[...]</code>
+                <ul>
+                    <li><code>0</code> : <code>"rspode@placeholder.me"</code></li>
+                    <li><code>1</code> : <code>"aglossop@placeholder.me"</code></li>
+                </ul>
+            </li>
+            <li><code>"learners"</code> : <code>[]</code></li>
+        </ul>
+    </li>
+    <li><code>"handlers"</code> : <code>{}</code></li>
+</ul>
+
+<h4>Propose change</h4>
+<form role="form">
+    <div class="form-group has-error">
+        <textarea class="form-control" name="event_json" rows="5">Event JSON here</textarea>
+        <span class="help-block js-prchange-help">Must be valid JSON.</span>
+    </div>
+    <fieldset disabled>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </fieldset>
+</form>
