@@ -20,3 +20,9 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+# Vim swpfiles
+*.swp
+
+# Compiled binary
+deje-admin
