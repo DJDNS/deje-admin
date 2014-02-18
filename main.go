@@ -7,23 +7,32 @@ import (
 	"net/http"
 )
 
-func do_home(r render.Render) {
-	r.HTML(200, "root", nil)
+type Page struct {
+	Nav  string
+	Data interface{}
+}
+
+type Handler func(render.Render)
+
+func make_handler(tmpl string) Handler {
+	return func(r render.Render) {
+		r.HTML(200, tmpl, Page{tmpl, nil})
+	}
 }
 
 func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
 	location, err := get_location(req)
 	if err != nil {
-		r.HTML(500, "error", err)
+		r.HTML(500, "error", Page{Data: err})
 		return
 	}
 
 	doc := c.GetDocument(*location)
-	r.HTML(200, "console", doc)
+	r.HTML(200, "console", Page{Data: doc})
 }
 
 func do_notfound(r render.Render) {
-	r.HTML(404, "404", nil)
+	r.HTML(404, "404", Page{})
 }
 
 func main() {
@@ -35,7 +44,9 @@ func main() {
 		Layout: "layout",
 	}))
 
-	m.Get("/", do_home)
+	m.Get("/", make_handler("root"))
+	m.Get("/about", make_handler("about"))
+	m.Get("/help", make_handler("help"))
 	m.Get("/open", do_open)
 	m.NotFound(do_notfound)
 

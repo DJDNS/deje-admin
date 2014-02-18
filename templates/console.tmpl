@@ -1,4 +1,5 @@
 <h1>Admin Console</h1>
+{{ with .Data }}
 <table>
     <thead>
         <tr>
@@ -15,6 +16,7 @@
         <td>{{ .Quorums.Length }}</td>
     </tr>
 </table>
+{{ end }}
 
 <h3>IRC log</h3>
 <pre class="pre-scrollable">
