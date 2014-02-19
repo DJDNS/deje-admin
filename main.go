@@ -17,6 +17,7 @@ func main() {
 
 	// Start services
 	go run_http(controller)
+	go run_sio(controller)
 
 	// Wait for interrupt
 	<-interrupter

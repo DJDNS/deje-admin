@@ -19,10 +19,7 @@
 {{ end }}
 
 <h3>IRC log</h3>
-<pre class="pre-scrollable">
-placeholder: Thing someone said
-&gt;&gt; Thing this server said
-</pre>
+<pre id="irc_logger" class="pre-scrollable"></pre>
 
 <h3>Current value</h3>
 <ul>
@@ -52,3 +49,8 @@ placeholder: Thing someone said
         <button type="submit" class="btn btn-primary">Submit</button>
     </fieldset>
 </form>
+<script>
+    $(document).ready(function(){
+        window.irc = new window.djadmin.irc()
+    });
+</script>
