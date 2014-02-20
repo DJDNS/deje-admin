@@ -1,5 +1,5 @@
-<h1>Admin Console</h1>
 {{ with .Data }}
+<h1>Admin Console</h1>
 <table>
     <thead>
         <tr>
@@ -16,7 +16,6 @@
         <td>{{ .Quorums.Length }}</td>
     </tr>
 </table>
-{{ end }}
 
 <h3>IRC log</h3>
 <pre id="irc_logger" class="pre-scrollable"></pre>
@@ -51,6 +50,7 @@
 </form>
 <script>
     $(document).ready(function(){
-        window.irc = new window.djadmin.irc()
+        window.irc = new window.djadmin.irc("{{ .Channel.GetURL }}")
     });
 </script>
+{{ end }}

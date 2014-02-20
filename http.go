@@ -5,7 +5,6 @@ import (
 	"github.com/campadrenalin/go-deje"
 	"github.com/codegangsta/martini"
 	"github.com/martini-contrib/render"
-	//"github.com/googollee/go-socket.io"
 	"net/http"
 )
 
