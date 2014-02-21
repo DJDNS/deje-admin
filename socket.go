@@ -3,6 +3,7 @@ package main
 // Socket.IO connection stuff
 import (
 	"github.com/campadrenalin/go-deje"
+	"github.com/campadrenalin/go-deje/model"
 	"github.com/googollee/go-socket.io"
 	"log"
 	"net/http"
@@ -57,10 +58,17 @@ func run_sio(controller *deje.DEJEController) {
 		log.Printf("disconnected: %v in channel %v", id, endpoint)
 	})
 	irc.On("subscribe", func(ns *socketio.NameSpace, url string) {
-		channel := make(chan string)
+		location := model.IRCLocation{}
+		parse_err := location.ParseFrom(url)
+		if parse_err != nil {
+			ns.Emit("error", parse_err.Error())
+			return
+		}
+
+		channel := controller.Networker.GetChannel(location)
 		cgetter := ns.Session.Values["cgetter"].(chan strchan)
-		cgetter <- channel
-		channel <- "Subscribed to " + url
+		cgetter <- channel.Incoming
+		channel.Incoming <- "Subscribed to " + url
 	})
 
 	http.ListenAndServe(":3001", sio)

@@ -17,6 +17,7 @@ function IRCLogger(url) {
     this.socket.on("connect",    this.on_connect.bind(this));
     this.socket.on("disconnect", this.on_disconnect.bind(this));
     this.socket.on("output",     this.on_output.bind(this));
+    this.socket.on("error",      this.on_error.bind(this));
 }
 
 IRCLogger.prototype.print = function(data) {
@@ -43,6 +44,9 @@ IRCLogger.prototype.on_disconnect = function() {
 
 IRCLogger.prototype.on_output = function(line) {
     this.print(line);
+}
+IRCLogger.prototype.on_error = function(line) {
+    this.print("ERROR: " + line);
 }
 IRCLogger.prototype.subscribe = function(url) {
     this.url = url;
