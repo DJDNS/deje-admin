@@ -32,6 +32,18 @@ func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
 	r.HTML(200, "console", Page{Data: doc})
 }
 
+// Events graph
+func do_events(req *http.Request, c *deje.DEJEController, r render.Render) {
+	location, err := get_location(req)
+	if err != nil {
+		r.HTML(500, "error", Page{Data: err})
+		return
+	}
+
+	doc := c.GetDocument(*location)
+	r.HTML(200, "events", doc, render.HTMLOptions{Layout:""})
+}
+
 func do_notfound(r render.Render) {
 	r.HTML(404, "404", Page{})
 }
@@ -48,6 +60,7 @@ func run_http(controller *deje.DEJEController) {
 	m.Get("/about", make_handler("about"))
 	m.Get("/help", make_handler("help"))
 	m.Get("/open", do_open)
+	m.Get("/events", do_events)
 	m.NotFound(do_notfound)
 
 	http.ListenAndServe(":3000", m)

@@ -1,0 +1,101 @@
+{
+    "label":"root",
+    "type": "root",
+    "details": "Root node. Any object with no parent, or an invalid/unknown parent, is treated like a child of root for graphing purposes.",
+    "children": [
+     {
+        "label": "SET",
+        "type":"event",
+        "details": {
+            "handler_name": "SET",
+            "author": "shoop@whoop.org",
+            "hash": "BADBEEFBEADHEAD",
+            "parenthash": "",
+            "arguments": {
+                "path": [],
+                "value": {"handlers":{"x":"y"}}
+            }
+        },
+        "children":[
+         {
+            "label": "SET",
+            "type":"event",
+            "details": {
+                "handler_name": "SET",
+                "author": "shoop@whoop.org",
+                "hash": "83428714282712478",
+                "parenthash": "BADBEEFBEADHEAD",
+                "arguments": {
+                    "path": ["handlers", "custom event handler"],
+                    "value": "some lua script"
+                }
+            },
+            "children":[
+             {
+                "label": "DELETE",
+                "type":"event",
+                "details": {
+                    "handler_name": "DELETE",
+                    "author": "shoop@whoop.org",
+                    "hash": "892838bac878ffe711",
+                    "parenthash": "83428714282712478",
+                    "arguments": {
+                        "path": ["handlers", "x"]
+                    }
+                },
+                "children":[
+                 {
+                    "label": "custom event handler",
+                    "type":"event",
+                    "details": {
+                        "handler_name": "custom event handler",
+                        "author": "shoop@whoop.org",
+                        "hash": "3210987654321",
+                        "parenthash": "892838bac878ffe711",
+                        "arguments": {
+                            "hello":"world"
+                        }
+                    },
+                    "children":[
+                    ]
+                 }
+                ]
+             }
+            ]
+         },
+         {
+            "label": "FEEDFACE0123456789",
+            "type":"quorum",
+            "details": {
+                "hash": "FEEDFACE0123456789",
+                "eventhash": "BADBEEFBEADHEAD",
+                "signers": ["shoop@whoop.org"]
+            },
+            "children":[
+            ]
+         },
+         {
+            "label": "FACEFEED0123456789",
+            "type":"quorum",
+            "details": {
+                "hash": "FACEFEED0123456789",
+                "eventhash": "BADBEEFBEADHEAD",
+                "signers": ["shoop@whoop.org"]
+            },
+            "children":[
+             {
+                "label": "Timestamp in block 8271478379",
+                "type":"timestamp",
+                "details": {
+                    "quorumhash": "FACEFEED0123456789",
+                    "blockheigh": 8271478379
+                },
+                "children":[
+                ]
+             }
+            ]
+         }
+        ]
+     }
+    ]
+}
