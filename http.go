@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/campadrenalin/go-deje"
 	"github.com/codegangsta/martini"
+	"github.com/martini-contrib/encoder"
 	"github.com/martini-contrib/render"
 	"net/http"
 )
@@ -19,6 +20,13 @@ func make_handler(tmpl string) Handler {
 	return func(r render.Render) {
 		r.HTML(200, tmpl, Page{tmpl, nil})
 	}
+}
+
+// Middleware
+
+func EncoderMiddleware(c martini.Context, w http.ResponseWriter) {
+	c.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 }
 
 func do_open(req *http.Request, c *deje.DEJEController, r render.Render) {
@@ -41,7 +49,7 @@ func do_events(req *http.Request, c *deje.DEJEController, r render.Render) {
 	}
 
 	doc := c.GetDocument(*location)
-	r.HTML(200, "events", doc, render.HTMLOptions{Layout:""})
+	r.HTML(200, "events", doc, render.HTMLOptions{Layout: ""})
 }
 
 func do_notfound(r render.Render) {
@@ -61,6 +69,7 @@ func run_http(controller *deje.DEJEController) {
 	m.Get("/help", make_handler("help"))
 	m.Get("/open", do_open)
 	m.Get("/events", do_events)
+	m.Get("/api/events", EncoderMiddleware, do_events_json)
 	m.NotFound(do_notfound)
 
 	http.ListenAndServe(":3000", m)
