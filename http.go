@@ -67,7 +67,7 @@ func run_http(controller *deje.DEJEController) {
 	m.Get("/help", make_handler("help"))
 	m.Get("/open", DocMiddleware, do_open)
 	m.Get("/events", DocMiddleware, do_events)
-	m.Get("/api/events", EncoderMiddleware, do_events_json)
+	m.Get("/api/events", DocMiddleware, EncoderMiddleware, do_events_json)
 	m.NotFound(do_notfound)
 
 	http.ListenAndServe(":3000", m)
