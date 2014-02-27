@@ -30,7 +30,9 @@ var graph_tests = []GraphTest{
 		GraphNode{
 			"root",
 			"root",
-			make(map[string]interface{}),
+			map[string]interface{}{
+				"about": graphRootExplanation,
+			},
 			make([]*GraphNode, 0),
 		},
 		"Empty document should just result in root node alone",

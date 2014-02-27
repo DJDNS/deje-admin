@@ -14,11 +14,16 @@ type GraphNode struct {
 	Children []*GraphNode           `json:"children"`
 }
 
+var graphRootExplanation = `Root node.
+
+Any object with no parent, or an invalid/unknown parent,
+is treated like a child of root for graphing purposes.`
+
 func NewRootNode() GraphNode {
 	return GraphNode{
 		Label:    "root",
 		Type:     "root",
-		Details:  make(map[string]interface{}),
+		Details:  map[string]interface{}{"about": graphRootExplanation},
 		Children: make([]*GraphNode, 0),
 	}
 }
