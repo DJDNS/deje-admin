@@ -24,8 +24,8 @@ func (test *GraphTest) Run(t *testing.T) {
 	}
 }
 
-var graph_tests = []GraphTest{
-	GraphTest{
+func TestGraph_Root(t *testing.T) {
+	test := &GraphTest{
 		djlogic.NewDocument(),
 		GraphNode{
 			"root",
@@ -36,11 +36,6 @@ var graph_tests = []GraphTest{
 			make([]*GraphNode, 0),
 		},
 		"Empty document should just result in root node alone",
-	},
-}
-
-func TestGraph(t *testing.T) {
-	for _, test := range graph_tests {
-		test.Run(t)
 	}
+	test.Run(t)
 }
