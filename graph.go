@@ -11,7 +11,7 @@ type GraphNode struct {
 	Label    string                 `json:"label"`
 	Type     string                 `json:"type"`
 	Details  map[string]interface{} `json:"details"`
-	Children []*GraphNode           `json:"children"`
+	Children []GraphNode            `json:"children"`
 }
 
 var graphRootExplanation = `Root node.
@@ -24,7 +24,7 @@ func NewRootNode() GraphNode {
 		Label:    "root",
 		Type:     "root",
 		Details:  map[string]interface{}{"about": graphRootExplanation},
-		Children: make([]*GraphNode, 0),
+		Children: make([]GraphNode, 0),
 	}
 }
 
@@ -33,30 +33,48 @@ func NewEventNode(ev djmodel.Event) GraphNode {
 		Label:    ev.HandlerName,
 		Type:     "event",
 		Details:  make(map[string]interface{}),
-		Children: make([]*GraphNode, 0),
+		Children: make([]GraphNode, 0),
 	}
 }
 
-func (gn GraphNode) GetRootEvents(doc djlogic.Document) []djmodel.Event {
+func (gn *GraphNode) GetRootEvents(doc djlogic.Document) []djmodel.Event {
 	ev_map := make(map[string]djmodel.Event)
 	result := make([]djmodel.Event, 0)
 	doc.Events.SerializeTo(ev_map)
 	for _, event := range ev_map {
-		result = append(result, event)
+		_, has_parent := doc.Events.GetByKey(event.ParentHash)
+		if !has_parent {
+			result = append(result, event)
+		}
 	}
 	return result
 }
 
-func (gn GraphNode) Populate(doc djlogic.Document) {
+func (gn *GraphNode) PopulateRoot(doc djlogic.Document) {
 	root_events := gn.GetRootEvents(doc)
 	for _, event := range root_events {
 		ev_node := NewEventNode(event)
-		gn.Children = append(gn.Children, &ev_node)
+		ev_node.PopulateEvent(djlogic.Event{event, &doc})
+		gn.Children = append(gn.Children, ev_node)
+	}
+}
+
+func (gn *GraphNode) PopulateEvent(event djlogic.Event) {
+	children := event.GetChildren()
+	for _, child := range children {
+		child_node := NewEventNode(child.(djmodel.Event))
+		child_node.PopulateEvent(
+			djlogic.Event{
+				child.(djmodel.Event),
+				event.Doc,
+			},
+		)
+		gn.Children = append(gn.Children, child_node)
 	}
 }
 
 func do_events_json(doc djlogic.Document, enc encoder.Encoder) (int, []byte) {
 	root_node := NewRootNode()
-	root_node.Populate(doc)
+	root_node.PopulateRoot(doc)
 	return http.StatusOK, encoder.Must(enc.Encode(root_node))
 }

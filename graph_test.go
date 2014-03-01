@@ -33,7 +33,7 @@ func (gtd *GraphTestDocument) GetExpected() GraphNode { return gtd.Expected }
 func (gtd *GraphTestDocument) GetMessage() string     { return gtd.FailureMsg }
 func (gtd *GraphTestDocument) GetResult() GraphNode {
 	root_node := NewRootNode()
-	root_node.Populate(gtd.Doc)
+	root_node.PopulateRoot(gtd.Doc)
 	return root_node
 }
 
@@ -55,7 +55,7 @@ func TestGraph_NewRootNode(t *testing.T) {
 			map[string]interface{}{
 				"about": graphRootExplanation,
 			},
-			make([]*GraphNode, 0),
+			make([]GraphNode, 0),
 		},
 		"Expected different value for root node",
 	}
@@ -71,6 +71,20 @@ func TestGraph_Root(t *testing.T) {
 	RunGraphTest(test, t)
 }
 
+func TestGraph_GetRootEvents(t *testing.T) {
+	doc := djlogic.NewDocument()
+	event := djmodel.NewEvent("example")
+	event.Arguments["hello"] = "world"
+	doc.Events.Register(event)
+
+	root := NewRootNode()
+	root_events := root.GetRootEvents(doc)
+	expected := []djmodel.Event{event}
+	if !reflect.DeepEqual(root_events, expected) {
+		t.Fatalf("Expected %#v, got %#v", expected, root_events)
+	}
+}
+
 func TestGraph_OneEvent(t *testing.T) {
 	doc := djlogic.NewDocument()
 	event := djmodel.NewEvent("example")
@@ -78,10 +92,44 @@ func TestGraph_OneEvent(t *testing.T) {
 	doc.Events.Register(event)
 
 	root := NewRootNode()
+	root.Children = append(root.Children, NewEventNode(event))
 	test := &GraphTestDocument{
 		doc,
 		root,
-		"Empty document should just result in root node alone",
+		"Graph should have one event as child of root",
+	}
+	RunGraphTest(test, t)
+}
+
+func TestGraph_ChainAndFork(t *testing.T) {
+	doc := djlogic.NewDocument()
+
+	first := djmodel.NewEvent("first")
+	second := djmodel.NewEvent("second")
+	third := djmodel.NewEvent("third")
+	fork := djmodel.NewEvent("fork")
+
+	second.ParentHash = first.Hash()
+	third.ParentHash = second.Hash()
+	fork.ParentHash = first.Hash()
+
+	for _, ev := range []djmodel.Event{first, second, third, fork} {
+		doc.Events.Register(ev)
+	}
+
+	root := NewRootNode()
+	node1 := NewEventNode(first)
+	node2 := NewEventNode(second)
+	node3 := NewEventNode(third)
+	nodeF := NewEventNode(fork)
+
+	node2.Children = []GraphNode{node3}
+	node1.Children = []GraphNode{node2, nodeF}
+	root.Children = []GraphNode{node1}
+	test := &GraphTestDocument{
+		doc,
+		root,
+		"Graph should have structure matching event tree",
 	}
 	RunGraphTest(test, t)
 }
