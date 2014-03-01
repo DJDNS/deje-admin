@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Event Graph for {{ .Channel.GetURL }}</title>
+<title>Event Graph for {{ .Data.Channel.GetURL }}</title>
 <style>
 .node circle {
   fill: #fff;
@@ -29,7 +29,9 @@
 </style>
 </head>
 <body>
-Event graph for <strong>{{ .Channel.GetURL }}</strong>
+Event graph for <strong>{{ .Data.Channel.GetURL }}</strong>
+(<a href="{{ with .Data }}/events?host={{ .Channel.Host }}&port={{ .Channel.Port }}&channel={{ .Channel.Channel }}{{ end }}{{ if not .Demo }}&demo=1{{ end }}">
+switch to {{ if .Demo }}real data{{ else }}demo data{{ end }}?</a>)
 <script src="/js/d3.min.js"></script>
 <script src="/js/jquery-2.1.0.min.js"></script>
 <script>

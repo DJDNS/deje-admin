@@ -13,13 +13,14 @@ import (
 type Page struct {
 	Nav  string
 	Data interface{}
+	Demo bool
 }
 
 type Handler func(render.Render)
 
 func make_handler(tmpl string) Handler {
 	return func(r render.Render) {
-		r.HTML(200, tmpl, Page{tmpl, nil})
+		r.HTML(200, tmpl, Page{Nav: tmpl})
 	}
 }
 
@@ -46,8 +47,14 @@ func do_open(doc djlogic.Document, r render.Render) {
 }
 
 // Events graph
-func do_events(doc djlogic.Document, r render.Render) {
-	r.HTML(200, "events", doc, render.HTMLOptions{Layout: ""})
+func do_events(doc djlogic.Document, r render.Render, req *http.Request) {
+	demo_form_value := get_form(req, "demo")
+	demo := (len(demo_form_value) > 0 && demo_form_value != "0")
+	page := Page{
+		Data: doc,
+		Demo: demo,
+	}
+	r.HTML(200, "events", page, render.HTMLOptions{Layout: ""})
 }
 
 func do_notfound(r render.Render) {
