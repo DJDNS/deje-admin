@@ -30,14 +30,15 @@
 </head>
 <body>
 Event graph for <strong>{{ .Data.Channel.GetURL }}</strong>
-(<a href="{{ with .Data }}/events?host={{ .Channel.Host }}&port={{ .Channel.Port }}&channel={{ .Channel.Channel }}{{ end }}{{ if not .Demo }}&demo=1{{ end }}">
+(<a href="{{ with .Data.Channel }}/events?host={{ .Host }}&port={{ .Port }}&channel={{ .Channel }}{{ end }}{{ if not .Demo }}&demo=1{{ end }}">
 switch to {{ if .Demo }}real data{{ else }}demo data{{ end }}?</a>)
 <script src="/js/d3.min.js"></script>
 <script src="/js/jquery-2.1.0.min.js"></script>
 <script>
 
 var width = 960,
-    height = 400;
+    height = 400,
+    url = '{{ if .Demo }}/events.json{{ else }}{{ with .Data.Channel }}/api/events?host={{ .Host }}&port={{ .Port }}&channel={{ .Channel }}{{ end }}{{ end }}';
 
 var cluster = d3.layout.cluster()
     .size([height, width - 260]);
@@ -59,7 +60,7 @@ function show_details(data) {
     $('#details').text(JSON.stringify(data.details, undefined, "  "));
 }
 
-d3.json("/events.json", function(error, root) {
+d3.json(url, function(error, root) {
   var nodes = cluster.nodes(root),
       links = cluster.links(nodes);
 
