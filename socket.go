@@ -41,8 +41,7 @@ func run_sio(controller *deje.DEJEController) {
 
 	sio := socketio.NewSocketIOServer(sock_config)
 
-	irc := sio.Of("/irc")
-	irc.On("connect", func(ns *socketio.NameSpace) {
+	sio.On("connect", func(ns *socketio.NameSpace) {
 		ns.Session.Values["stopper"] = make(chan interface{})
 		ns.Session.Values["cgetter"] = make(chan strchan)
 		go sio_irc_loop(controller, ns)
@@ -50,14 +49,14 @@ func run_sio(controller *deje.DEJEController) {
 		id, endpoint := ns.Id(), ns.Endpoint()
 		log.Printf("connected: %v in channel %v", id, endpoint)
 	})
-	irc.On("disconnect", func(ns *socketio.NameSpace) {
+	sio.On("disconnect", func(ns *socketio.NameSpace) {
 		stopper := ns.Session.Values["stopper"].(chan interface{})
 		stopper <- nil
 
 		id, endpoint := ns.Id(), ns.Endpoint()
 		log.Printf("disconnected: %v in channel %v", id, endpoint)
 	})
-	irc.On("subscribe", func(ns *socketio.NameSpace, url string) {
+	sio.On("subscribe", func(ns *socketio.NameSpace, url string) {
 		location := model.IRCLocation{}
 		parse_err := location.ParseFrom(url)
 		if parse_err != nil {
@@ -69,6 +68,7 @@ func run_sio(controller *deje.DEJEController) {
 		cgetter := ns.Session.Values["cgetter"].(chan strchan)
 		cgetter <- channel.Incoming
 		channel.Incoming <- "Subscribed to " + url
+		log.Printf("Subscribed!")
 	})
 
 	http.ListenAndServe(":3001", sio)

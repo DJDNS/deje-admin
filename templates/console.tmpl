@@ -61,9 +61,9 @@
     </fieldset>
 </form>
 <script>
-    require(['djadmin/irc'], function(IRCLogger) {
+    require(['djadmin/irc','djadmin/io'], function(IRCLogger, socket) {
         irc = new IRCLogger('#irc_logger');
-        irc.subscribe('{{ .Channel.GetURL }}');
+        socket.subscribe('{{ .Channel.GetURL }}');
     });
 </script>
 {{ end }}
