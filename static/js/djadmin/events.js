@@ -1,13 +1,14 @@
-define(['jquery'], function($) {
+define(['jquery','djadmin/io'], function($, socket) {
 
 function Inputter(form_selector) {
     this.form_element = $(form_selector);
     this.latency = 200; // milliseconds
     this.timeout = null;
     this.getTextarea().on(
-        'keyup change input propertychange',
+        'keyup change input propertychange focus blur',
         this.delay_evaluate.bind(this)
     );
+    this.form_element.on("submit", this.on_submit.bind(this));
 }
 
 Inputter.prototype.getTextarea = function() {
@@ -18,16 +19,20 @@ Inputter.prototype.getMsgarea = function() {
 }
 
 Inputter.prototype.enable = function() {
-    this.form_element.children('.form-group')
-        .removeClass('has-error')
-        .addClass('has-success');
+    var form_group = this.form_element.children('.form-group');
+    if (form_group.hasClass('has-success')) {
+        return;
+    }
+    form_group.removeClass('has-error').addClass('has-success');
     this.form_element.children('fieldset').removeAttr('disabled');
     this.getMsgarea().text("That's valid. Good job.");
 }
 Inputter.prototype.disable = function(msg) {
-    this.form_element.children('.form-group')
-        .addClass('has-error')
-        .removeClass('has-success');
+    var form_group = this.form_element.children('.form-group');
+    if (form_group.hasClass('has-error')) {
+        return;
+    }
+    form_group.addClass('has-error').removeClass('has-success');
     this.form_element.children('fieldset').attr('disabled', true);
     this.getMsgarea().text(msg || "Must be valid JSON.");
 }
@@ -52,6 +57,14 @@ Inputter.prototype.delay_evaluate = function() {
     )
 }
 
+Inputter.prototype.on_submit = function(e) {
+    var value;
+    e.preventDefault();
+
+    value = this.getTextarea().val();
+    socket.emit("event", value);
+    this.getMsgarea().text("Published event");
+}
 
 return {
     "Inputter": Inputter
