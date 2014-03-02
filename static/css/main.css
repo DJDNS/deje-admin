@@ -31,3 +31,7 @@ body {
         max-width: 730px;
     }
 }
+
+.pre-scrollable {
+    max-height: 140px;
+}
