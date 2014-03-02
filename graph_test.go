@@ -61,6 +61,30 @@ func TestGraph_NewRootNode(t *testing.T) {
 	}
 	RunGraphTest(test, t)
 }
+func TestGraph_NewEventNode(t *testing.T) {
+	event := djmodel.NewEvent("moose")
+	event.ParentHash = "applesauce"
+	event.Arguments["hello"] = "world"
+
+	test := &GraphTestNode{
+		NewEventNode(event),
+		GraphNode{
+			"moose",
+			"event",
+			map[string]interface{}{
+				"handler_name": "moose",
+				"hash":         event.Hash(),
+				"parent_hash":  "applesauce",
+				"arguments": map[string]interface{}{
+					"hello": "world",
+				},
+			},
+			make([]GraphNode, 0),
+		},
+		"Expected different value for event node",
+	}
+	RunGraphTest(test, t)
+}
 
 func TestGraph_Root(t *testing.T) {
 	test := &GraphTestDocument{

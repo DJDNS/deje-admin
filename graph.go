@@ -30,9 +30,15 @@ func NewRootNode() GraphNode {
 
 func NewEventNode(ev djmodel.Event) GraphNode {
 	return GraphNode{
-		Label:    ev.HandlerName,
-		Type:     "event",
-		Details:  make(map[string]interface{}),
+		Label: ev.HandlerName,
+		Type:  "event",
+		Details: map[string]interface{}{
+			"handler_name": ev.HandlerName,
+			//"author": ev.Author,
+			"hash":        ev.Hash(),
+			"parent_hash": ev.ParentHash,
+			"arguments":   ev.Arguments,
+		},
 		Children: make([]GraphNode, 0),
 	}
 }
