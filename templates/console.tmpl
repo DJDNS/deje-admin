@@ -51,7 +51,7 @@
 </ul>
 
 <h4>Propose change</h4>
-<form role="form">
+<form id="event_input" role="form">
     <div class="form-group has-error">
         <textarea class="form-control" name="event_json" rows="5">Event JSON here</textarea>
         <span class="help-block js-prchange-help">Must be valid JSON.</span>
@@ -61,8 +61,10 @@
     </fieldset>
 </form>
 <script>
-    require(['djadmin/irc','djadmin/io'], function(IRCLogger, socket) {
+    require(['djadmin/irc','djadmin/events','djadmin/io'],
+     function(IRCLogger,   Events,           socket) {
         irc = new IRCLogger('#irc_logger');
+        evinput = new Events.Inputter('#event_input');
         socket.subscribe('{{ .Channel.GetURL }}');
     });
 </script>
