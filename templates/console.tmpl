@@ -1,19 +1,19 @@
 {{ with .Data }}
 <h1>Admin Console</h1>
-<table>
+<table id="stats">
     <thead>
         <tr>
             <td>Location</td>
             <td>Num. Events</td>
-            <td>Num. Timestamps</td>
             <td>Num. Quorums</td>
+            <td>Num. Timestamps</td>
         </tr>
     </thead>
     <tr>
         <td>{{ .Channel.GetURL }}</td>
-        <td>{{ .Events.Length }}</td>
-        <td>{{ .Timestamps.Length }}</td>
-        <td>{{ .Quorums.Length }}</td>
+        <td class="num_events">{{ .Events.Length }}</td>
+        <td class="num_quorums">{{ .Quorums.Length }}</td>
+        <td class="num_ts">{{ .Timestamps.Length }}</td>
     </tr>
 </table>
 
@@ -67,6 +67,10 @@
         irc = new IRCLogger('#irc_logger');
         evinput = new Events.Inputter('#event_input');
         socket.subscribe('{{ .Channel.GetURL }}');
+    });
+    require(['djadmin/stats'],
+     function(StatsUpdater) {
+        stats = new StatsUpdater('#stats');
     });
 </script>
 {{ end }}
