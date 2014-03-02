@@ -4,11 +4,22 @@ function Inputter(form_selector) {
     this.form_element = $(form_selector);
     this.latency = 200; // milliseconds
     this.timeout = null;
+    this.template = {
+        "parent": "123456789",
+        "handler": "SET",
+        "args": {
+            "path": [],
+            "value": { "hello": "world"}
+        }
+    }
     this.getTextarea().on(
         'keyup change input propertychange focus blur',
         this.delay_evaluate.bind(this)
     );
     this.form_element.on("submit", this.on_submit.bind(this));
+    this.form_element.find('.btn-secondary').click(
+        this.fill_from_template.bind(this)
+    );
     socket.on("event_registered", this.on_register.bind(this));
     socket.on("event_error", this.on_error.bind(this));
 }
@@ -26,7 +37,7 @@ Inputter.prototype.enable = function() {
         return;
     }
     form_group.removeClass('has-error').addClass('has-success');
-    this.form_element.children('fieldset').removeAttr('disabled');
+    this.form_element.find('fieldset .btn-primary').removeAttr('disabled');
     this.getMsgarea().text("That's valid. Good job.");
 }
 Inputter.prototype.disable = function(msg) {
@@ -35,7 +46,7 @@ Inputter.prototype.disable = function(msg) {
         return;
     }
     form_group.addClass('has-error').removeClass('has-success');
-    this.form_element.children('fieldset').attr('disabled', true);
+    this.form_element.find('fieldset .btn-primary').attr('disabled', "disabled");
     this.getMsgarea().text(msg || "Must be valid JSON.");
 }
 
@@ -75,6 +86,13 @@ Inputter.prototype.on_error = function(msg) {
     this.getMsgarea().text(msg);
     //this.disable()
 }
+
+Inputter.prototype.fill_from_template = function() {
+    this.getTextarea().text(
+        JSON.stringify(this.template, undefined, "  ")
+    );
+}
+
 
 
 return {
