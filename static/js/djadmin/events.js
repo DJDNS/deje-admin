@@ -9,6 +9,8 @@ function Inputter(form_selector) {
         this.delay_evaluate.bind(this)
     );
     this.form_element.on("submit", this.on_submit.bind(this));
+    socket.on("event_registered", this.on_register.bind(this));
+    socket.on("event_error", this.on_error.bind(this));
 }
 
 Inputter.prototype.getTextarea = function() {
@@ -62,9 +64,18 @@ Inputter.prototype.on_submit = function(e) {
     e.preventDefault();
 
     value = this.getTextarea().val();
+    this.getMsgarea().text("Publishing event...");
     socket.emit("event", value);
-    this.getMsgarea().text("Published event");
 }
+
+Inputter.prototype.on_register = function(hash) {
+    this.getMsgarea().text("Event "+hash+" published!");
+}
+Inputter.prototype.on_error = function(msg) {
+    this.getMsgarea().text(msg);
+    //this.disable()
+}
+
 
 return {
     "Inputter": Inputter

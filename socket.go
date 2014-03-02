@@ -2,6 +2,7 @@ package main
 
 // Socket.IO connection stuff
 import (
+	"encoding/json"
 	"github.com/campadrenalin/go-deje"
 	"github.com/campadrenalin/go-deje/model"
 	"github.com/googollee/go-socket.io"
@@ -63,12 +64,35 @@ func run_sio(controller *deje.DEJEController) {
 			ns.Emit("error", parse_err.Error())
 			return
 		}
+		ns.Session.Values["location"] = location
 
 		channel := controller.Networker.GetChannel(location)
 		cgetter := ns.Session.Values["cgetter"].(chan strchan)
 		cgetter <- channel.Incoming
 		channel.Incoming <- "Subscribed to " + url
-		log.Printf("Subscribed!")
+		//log.Printf("Subscribed!")
+	})
+	sio.On("event", func(ns *socketio.NameSpace, evstr string) {
+		log.Printf("Incoming event: %s", evstr)
+		loc, ok := ns.Session.Values["location"]
+		if !ok {
+			ns.Emit("error", "Not subscribed yet, cannot publish events")
+			return
+		}
+		location := loc.(model.IRCLocation)
+
+		var event model.Event
+		err := json.Unmarshal([]byte(evstr), &event)
+		if err != nil {
+			ns.Emit("error", err.Error())
+			ns.Emit("event_error", err.Error())
+			log.Printf("Invalid event: %v", err)
+			return
+		}
+
+		doc := controller.GetDocument(location)
+		doc.Events.Register(event)
+		ns.Emit("event_registered", event.Hash())
 	})
 
 	http.ListenAndServe(":3001", sio)
