@@ -61,8 +61,8 @@
     </fieldset>
 </form>
 <script>
-    $(document).ready(function(){
-        window.irc = new window.djadmin.irc("{{ .Channel.GetURL }}")
+    require(['deje-admin'], function(djadmin) {
+        window.irc = new djadmin.irc("{{ .Channel.GetURL }}");
     });
 </script>
 {{ end }}

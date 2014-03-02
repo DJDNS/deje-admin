@@ -11,7 +11,25 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <link href="css/main.css" rel="stylesheet">
-    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/require.js"></script>
+    <script>
+        require.config({
+            baseUrl: "/js/",
+            paths: {
+                "jquery": "jquery-2.1.0.min"
+            },
+            shim: {
+                "bootstrap": {
+                    deps: ["jquery"]
+                },
+                "socket.io": {
+                    exports: "io"
+                }
+            }
+        });
+        // Don't actually do anything with bootstrap, just include it
+        require(['bootstrap'], function(){});
+    </script>
 </head>
 <body>
 <div class="container">
@@ -27,8 +45,5 @@
         {{ yield }}
     </div>
 </div>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/socket.io.js"></script>
-<script src="js/deje-admin.js"></script>
 </body>
 </html>

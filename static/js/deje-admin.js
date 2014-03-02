@@ -1,5 +1,5 @@
 // Admin interface code
-(function(){
+define(['jquery', 'socket.io'], function($, io) {
 
 function get_sio(resource) {
     return [
@@ -54,10 +54,8 @@ IRCLogger.prototype.subscribe = function(url) {
     this.socket.emit("subscribe", url);
 }
 
-
-window.djadmin = {
-    'get_sio': get_sio,
+return {
     'irc': IRCLogger
 }
 
-}());
+});
