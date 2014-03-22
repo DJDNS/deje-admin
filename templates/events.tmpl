@@ -1,40 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Event Graph for {{ .Data.Channel.GetURL }}</title>
-<style>
-.node circle {
-  fill: #fff;
-  stroke-width: 1.5px;
-}
-
-.node {
-  font: 10px sans-serif;
-}
-
-.node.root circle { stroke: red; }
-.node.event circle { stroke: steelblue; }
-.node.quorum circle { stroke: purple; }
-.node.timestamp circle { stroke: orange; }
-
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-#details {
-  white-space: pre-wrap;
-}
-</style>
+    <title>Event Graph for {{ .Data.Channel.GetURL }}</title>
+    <link href="css/graph.css" rel="stylesheet">
+    <script src="js/require.js"></script>
+    <script>
+        require.config({
+            baseUrl: "/js/",
+            paths: {
+                "jquery": "jquery-2.1.0.min",
+                "d3": "d3.min"
+            },
+            shim: {
+                "socket.io": {
+                    exports: "io"
+                }
+            }
+        });
+    </script>
 </head>
 <body>
 Event graph for <strong>{{ .Data.Channel.GetURL }}</strong>
 (<a href="{{ with .Data.Channel }}/events?host={{ .Host }}&port={{ .Port }}&channel={{ .Channel }}{{ end }}{{ if not .Demo }}&demo=1{{ end }}">
 switch to {{ if .Demo }}real data{{ else }}demo data{{ end }}?</a>)
-<script src="/js/d3.min.js"></script>
-<script src="/js/jquery-2.1.0.min.js"></script>
+<svg></svg>
 <script>
+require(['jquery', 'd3'], function($, d3) {
 
 var width = 960,
     height = 400,
@@ -46,7 +37,7 @@ var cluster = d3.layout.cluster()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("svg")
     .attr("width", width)
     .attr("height", height)
   .append("g")
@@ -88,6 +79,8 @@ d3.json(url, function(error, root) {
 });
 
 d3.select(self.frameElement).style("height", height + "px");
+
+});
 </script>
 <pre id="details"></pre>
 </body>

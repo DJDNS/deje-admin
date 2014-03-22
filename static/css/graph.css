@@ -1,0 +1,23 @@
+.node circle {
+  fill: #fff;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.node.root circle { stroke: red; }
+.node.event circle { stroke: steelblue; }
+.node.quorum circle { stroke: purple; }
+.node.timestamp circle { stroke: orange; }
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+#details {
+  white-space: pre-wrap;
+}
