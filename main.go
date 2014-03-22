@@ -3,6 +3,7 @@ package main
 // Set up DEJEController and run client servers
 import (
 	"github.com/campadrenalin/go-deje"
+	"github.com/campadrenalin/deje-admin/socket"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,7 +18,7 @@ func main() {
 
 	// Start services
 	go run_http(controller)
-	go run_sio(controller)
+	go socket.Run(controller)
 
 	// Wait for interrupt
 	<-interrupter

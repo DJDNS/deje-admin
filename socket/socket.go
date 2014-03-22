@@ -1,6 +1,6 @@
-package main
-
 // Socket.IO connection stuff
+package socket
+
 import (
 	"encoding/json"
 	"errors"
@@ -68,7 +68,7 @@ func get_document(c *deje.DEJEController, ns *socketio.NameSpace) (*djlogic.Docu
 	return &doc, nil
 }
 
-func run_sio(controller *deje.DEJEController) {
+func Run(controller *deje.DEJEController) {
 	sock_config := &socketio.Config{}
 	sock_config.HeartbeatTimeout = 2
 	sock_config.ClosingTimeout = 4
