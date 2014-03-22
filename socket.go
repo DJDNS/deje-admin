@@ -160,7 +160,11 @@ func run_sio(controller *deje.DEJEController) {
 			ns.Emit("error", "Hash "+hash+" not found")
 		}
 		event := djlogic.Event{raw.(model.Event), doc}
-		event.Goto()
+		err = event.Goto()
+		if err != nil {
+			ns.Emit("error", err.Error())
+			return
+		}
 		primitive := &djstate.SetPrimitive{
 			Path:  []interface{}{},
 			Value: doc.State.Export(),
