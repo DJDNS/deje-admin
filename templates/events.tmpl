@@ -25,7 +25,7 @@ Event graph for <strong>{{ .Data.Channel.GetURL }}</strong>
 switch to {{ if .Demo }}real data{{ else }}demo data{{ end }}?</a>)
 <svg></svg>
 <script>
-require(['jquery', 'd3'], function($, d3) {
+require(['jquery', 'd3', 'djadmin/goto'], function($, d3, goto_event) {
 
 var width = 960,
     height = 400,
@@ -49,6 +49,15 @@ function get_class(data) {
 
 function show_details(data) {
     $('#details').text(JSON.stringify(data.details, undefined, "  "));
+    if (data.type == "event") {
+        var hash = data.details.hash;
+        var link = $('a.goto_event');
+        link.text("Go to " + hash);
+        link.off('click').click(function() {
+            goto_event(hash);
+            return false;
+        });
+    }
 }
 
 d3.json(url, function(error, root) {
@@ -81,7 +90,12 @@ d3.json(url, function(error, root) {
 d3.select(self.frameElement).style("height", height + "px");
 
 });
+
+require(['djadmin/io'], function(socket) {
+    socket.subscribe('{{ .Data.Channel.GetURL }}');
+});
 </script>
 <pre id="details"></pre>
+<a class="goto_event" href="#"></a>
 </body>
 </html>
