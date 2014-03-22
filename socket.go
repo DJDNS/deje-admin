@@ -7,6 +7,7 @@ import (
 	"github.com/campadrenalin/go-deje"
 	djlogic "github.com/campadrenalin/go-deje/logic"
 	"github.com/campadrenalin/go-deje/model"
+	djstate "github.com/campadrenalin/go-deje/state"
 	"github.com/googollee/go-socket.io"
 	"log"
 	"net/http"
@@ -35,6 +36,26 @@ func sio_irc_loop(c *deje.DEJEController, ns *socketio.NameSpace) {
 			continue // Do nothing
 		}
 	}
+}
+
+type PrimitiveWrapper struct {
+	Type      string
+	Arguments djstate.Primitive `json:"args"`
+}
+
+func wrap_primitive(p djstate.Primitive) PrimitiveWrapper {
+	wrapper := PrimitiveWrapper{
+		Arguments: p,
+	}
+	switch p.(type) {
+	case *djstate.SetPrimitive:
+		wrapper.Type = "SET"
+	case *djstate.DeletePrimitive:
+		wrapper.Type = "DELETE"
+	default:
+		wrapper.Type = "unknown type"
+	}
+	return wrapper
 }
 
 func get_document(c *deje.DEJEController, ns *socketio.NameSpace) (*djlogic.Document, error) {
@@ -82,6 +103,17 @@ func run_sio(controller *deje.DEJEController) {
 		cgetter := ns.Session.Values["cgetter"].(chan strchan)
 		cgetter <- channel.Incoming
 		channel.Incoming <- "Subscribed to " + url
+
+		doc, err := get_document(controller, ns)
+		if err != nil {
+			ns.Emit("error", err.Error())
+			return
+		}
+		primitive := &djstate.SetPrimitive{
+			Path:  []interface{}{},
+			Value: doc.State.Export(),
+		}
+		ns.Emit("primitive", wrap_primitive(primitive))
 		//log.Printf("Subscribed!")
 	})
 	sio.On("event", func(ns *socketio.NameSpace, evstr string) {

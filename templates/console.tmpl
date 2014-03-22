@@ -33,22 +33,9 @@
 <pre id="irc_logger" class="pre-scrollable"></pre>
 
 <h3>Current value</h3>
-<ul>
-    <li>
-        <code>"paxos"</code> : <code>{...}</code>
-        <ul>
-            <li>
-                <code>"acceptors"</code> : <code>[...]</code>
-                <ul>
-                    <li><code>0</code> : <code>"rspode@placeholder.me"</code></li>
-                    <li><code>1</code> : <code>"aglossop@placeholder.me"</code></li>
-                </ul>
-            </li>
-            <li><code>"learners"</code> : <code>[]</code></li>
-        </ul>
-    </li>
-    <li><code>"handlers"</code> : <code>{}</code></li>
-</ul>
+<div id="state">
+...
+</div>
 
 <h4>Propose change</h4>
 <form id="event_input" role="form">
@@ -71,6 +58,10 @@
     require(['djadmin/stats'],
      function(StatsUpdater) {
         stats = new StatsUpdater('#stats');
+    });
+    require(['djadmin/state'],
+     function(StateDisplay) {
+        sd = new StateDisplay('#state');
     });
 </script>
 {{ end }}
