@@ -26,7 +26,9 @@
 
 <p>
     <a target="_blank" href="/events?host={{ .Channel.Host }}&port={{ .Channel.Port }}&channel={{ .Channel.Channel }}">View events</a>
-    (Latest is <span id="latest_event_hash">DEADBEEF</span>)
+    (Latest is <span id="latest_event_hash">DEADBEEF</span>).
+    Go to: <input class="goto_event"/>
+        <button type="submit" class="btn btn-primary goto_event">Go</button>
 </p>
 
 <h3>IRC log</h3>
@@ -62,6 +64,17 @@
     require(['djadmin/state'],
      function(StateDisplay) {
         sd = new StateDisplay('#state');
+    });
+
+    require(['djadmin/goto'], function(goto_event) {
+        $('button.goto_event').click(function() {
+            var hash;
+            hash = $('input.goto_event').val();
+            goto_event(hash);
+        });
+
+        // TODO: Remove
+        window.goto_event = goto_event;
     });
 </script>
 {{ end }}

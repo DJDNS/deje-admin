@@ -149,6 +149,24 @@ func run_sio(controller *deje.DEJEController) {
 		}
 		ns.Emit("stats", data)
 	})
+	sio.On("goto_request", func(ns *socketio.NameSpace, hash string) {
+		doc, err := get_document(controller, ns)
+		if err != nil {
+			ns.Emit("error", err.Error())
+			return
+		}
+		raw, ok := doc.Events.GetByKey(hash)
+		if !ok {
+			ns.Emit("error", "Hash "+hash+" not found")
+		}
+		event := djlogic.Event{raw.(model.Event), doc}
+		event.Goto()
+		primitive := &djstate.SetPrimitive{
+			Path:  []interface{}{},
+			Value: doc.State.Export(),
+		}
+		ns.Emit("primitive", wrap_primitive(primitive))
+	})
 
 	http.ListenAndServe(":3001", sio)
 }

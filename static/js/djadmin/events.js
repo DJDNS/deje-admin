@@ -1,4 +1,5 @@
-define(['jquery','djadmin/io'], function($, socket) {
+define(['jquery','djadmin/io','djadmin/goto'],
+function($,       socket,      goto_event) {
 
 function Inputter(form_selector) {
     this.form_element = $(form_selector);
@@ -80,7 +81,16 @@ Inputter.prototype.on_submit = function(e) {
 }
 
 Inputter.prototype.on_register = function(hash) {
-    this.getMsgarea().text("Event "+hash+" published!");
+    var msgarea = this.getMsgarea();
+    msgarea.html([
+        'Event ',
+         '<a href="#" class="js-goto-hash">', hash, '</a>',
+         ' published!'
+    ].join(''));
+    msgarea.find('a.js-goto-hash').click(function(e) {
+        e.preventDefault();
+        goto_event(hash);
+    });
 }
 Inputter.prototype.on_error = function(msg) {
     this.getMsgarea().text(msg);
@@ -92,8 +102,6 @@ Inputter.prototype.fill_from_template = function() {
         JSON.stringify(this.template, undefined, "  ")
     );
 }
-
-
 
 return {
     "Inputter": Inputter

@@ -1,25 +1,27 @@
 define(['jquery', 'djadmin/io'], function($, socket) {
 
+var test_display_value = {
+    "paxos": {
+        "acceptors" : [
+            "rspode@placeholder.me",
+            "aglossop@placeholder.me"
+        ],
+        "learners" : [],
+    },
+    "handlers": {},
+    "misc": {
+        "true": true,
+        "false": false,
+        "null": null,
+        "a float": -98.5,
+        "an int": 17,
+    }
+};
+
 // Expects a <div>
 function StateDisplay(display_selector) {
     this.element = $(display_selector);
-    this.value = {
-        "paxos": {
-            "acceptors" : [
-                "rspode@placeholder.me",
-                "aglossop@placeholder.me"
-            ],
-            "learners" : [],
-        },
-        "handlers": {},
-        "misc": {
-            "true": true,
-            "false": false,
-            "null": null,
-            "a float": -98.5,
-            "an int": 17,
-        }
-    };
+    this.value = {};
 
     socket.on("primitive", this.on_primitive.bind(this));
     this.render_root();
