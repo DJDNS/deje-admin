@@ -2,8 +2,8 @@ package main
 
 // Set up DEJEController and run client servers
 import (
-	"github.com/campadrenalin/go-deje"
 	"github.com/campadrenalin/deje-admin/socket"
+	"github.com/campadrenalin/go-deje"
 	"os"
 	"os/signal"
 	"syscall"

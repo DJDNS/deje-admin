@@ -13,31 +13,6 @@ import (
 	"net/http"
 )
 
-type strchan chan string
-
-func sio_irc_loop(c *deje.DEJEController, ns *socketio.NameSpace) {
-	defer log.Printf("Ending sio_irc_loop for %v", ns.Id())
-
-	// Set up stopper and cgetter chans
-	stopper := ns.Session.Values["stopper"].(chan interface{})
-	cgetter := ns.Session.Values["cgetter"].(chan strchan)
-
-	// Create IRC channel listener (nil)
-	var channel strchan
-
-	// Listen for any
-	for {
-		select {
-		case <-stopper:
-			return
-		case line := <-channel:
-			ns.Emit("output", line)
-		case channel = <-cgetter:
-			continue // Do nothing
-		}
-	}
-}
-
 type PrimitiveWrapper struct {
 	Type      string
 	Arguments djstate.Primitive `json:"args"`
@@ -59,12 +34,11 @@ func wrap_primitive(p djstate.Primitive) PrimitiveWrapper {
 }
 
 func get_document(c *deje.DEJEController, ns *socketio.NameSpace) (*djlogic.Document, error) {
-	loc, ok := ns.Session.Values["location"]
+	sub, ok := ns.Session.Values["subscription"]
 	if !ok {
 		return nil, errors.New("Not subscribed yet, cannot publish events")
 	}
-	location := loc.(model.IRCLocation)
-	doc := c.GetDocument(location)
+	doc := sub.(*Subscription).Document
 	return &doc, nil
 }
 
@@ -76,45 +50,33 @@ func Run(controller *deje.DEJEController) {
 	sio := socketio.NewSocketIOServer(sock_config)
 
 	sio.On("connect", func(ns *socketio.NameSpace) {
-		ns.Session.Values["stopper"] = make(chan interface{})
-		ns.Session.Values["cgetter"] = make(chan strchan)
-		go sio_irc_loop(controller, ns)
-
 		id, endpoint := ns.Id(), ns.Endpoint()
 		log.Printf("connected: %v in channel %v", id, endpoint)
 	})
 	sio.On("disconnect", func(ns *socketio.NameSpace) {
-		stopper := ns.Session.Values["stopper"].(chan interface{})
-		stopper <- nil
-
+		sub, ok := ns.Session.Values["subscription"]
+		if ok {
+			delete(ns.Session.Values, "subscription")
+			sub.(*Subscription).Stop()
+		}
 		id, endpoint := ns.Id(), ns.Endpoint()
 		log.Printf("disconnected: %v in channel %v", id, endpoint)
 	})
 	sio.On("subscribe", func(ns *socketio.NameSpace, url string) {
-		location := model.IRCLocation{}
-		parse_err := location.ParseFrom(url)
-		if parse_err != nil {
-			ns.Emit("error", parse_err.Error())
-			return
-		}
-		ns.Session.Values["location"] = location
-
-		channel := controller.Networker.GetChannel(location)
-		cgetter := ns.Session.Values["cgetter"].(chan strchan)
-		cgetter <- channel.Incoming
-		channel.Incoming <- "Subscribed to " + url
-
-		doc, err := get_document(controller, ns)
+		sub, err := NewSubscription(controller, url)
 		if err != nil {
 			ns.Emit("error", err.Error())
 			return
 		}
+		ns.Session.Values["subscription"] = sub
+		go sub.Run(ns)
+		sub.IRC.Incoming <- "Subscribed to " + url
+
 		primitive := &djstate.SetPrimitive{
 			Path:  []interface{}{},
-			Value: doc.State.Export(),
+			Value: sub.Document.State.Export(),
 		}
 		ns.Emit("primitive", wrap_primitive(primitive))
-		//log.Printf("Subscribed!")
 	})
 	sio.On("event", func(ns *socketio.NameSpace, evstr string) {
 		log.Printf("Incoming event: %s", evstr)
