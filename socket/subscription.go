@@ -69,7 +69,7 @@ func (s *Subscription) Stop() {
 }
 
 type PrimitiveWrapper struct {
-	Type      string
+	Type      string            `json:"type"`
 	Arguments djstate.Primitive `json:"args"`
 }
 

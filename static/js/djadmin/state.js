@@ -27,8 +27,34 @@ function StateDisplay(display_selector) {
     this.render_root();
 }
 
+// Traverse a path through an object
+StateDisplay.prototype.traverse = function(path, obj) {
+    var i, key;
+    for (i = 0; i < path.length; i++) {
+        key = path[i];
+        obj = obj[key]
+        if (typeof(obj) != "object") {
+            throw "Bad traversal: " + JSON.stringify(path);
+        }
+    }
+    return obj;
+}
+
 StateDisplay.prototype.on_primitive = function(primitive) {
-    this.value = primitive.args.Value;
+    var path, last, parent_obj;
+    if (primitive.type == "SET") {
+        // path is reference, not clone!
+        path = primitive.args.Path;
+        if (path.length > 0) {
+            last = path.pop();
+            parent_obj = this.traverse(path, this.value)
+        } else {
+            last = "value";
+            parent_obj = this
+        }
+
+        parent_obj[last] = primitive.args.Value;
+    }
     this.render_root();
 }
 
