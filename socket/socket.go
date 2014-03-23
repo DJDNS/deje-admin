@@ -7,31 +7,10 @@ import (
 	"github.com/campadrenalin/go-deje"
 	djlogic "github.com/campadrenalin/go-deje/logic"
 	"github.com/campadrenalin/go-deje/model"
-	djstate "github.com/campadrenalin/go-deje/state"
 	"github.com/googollee/go-socket.io"
 	"log"
 	"net/http"
 )
-
-type PrimitiveWrapper struct {
-	Type      string
-	Arguments djstate.Primitive `json:"args"`
-}
-
-func wrap_primitive(p djstate.Primitive) PrimitiveWrapper {
-	wrapper := PrimitiveWrapper{
-		Arguments: p,
-	}
-	switch p.(type) {
-	case *djstate.SetPrimitive:
-		wrapper.Type = "SET"
-	case *djstate.DeletePrimitive:
-		wrapper.Type = "DELETE"
-	default:
-		wrapper.Type = "unknown type"
-	}
-	return wrapper
-}
 
 func get_document(c *deje.DEJEController, ns *socketio.NameSpace) (*djlogic.Document, error) {
 	sub, ok := ns.Session.Values["subscription"]
@@ -71,12 +50,7 @@ func Run(controller *deje.DEJEController) {
 		ns.Session.Values["subscription"] = sub
 		go sub.Run(ns)
 		sub.IRC.Incoming <- "Subscribed to " + url
-
-		primitive := &djstate.SetPrimitive{
-			Path:  []interface{}{},
-			Value: sub.Document.State.Export(),
-		}
-		ns.Emit("primitive", wrap_primitive(primitive))
+		sub.SendState(ns)
 	})
 	sio.On("event", func(ns *socketio.NameSpace, evstr string) {
 		log.Printf("Incoming event: %s", evstr)
@@ -127,11 +101,6 @@ func Run(controller *deje.DEJEController) {
 			ns.Emit("error", err.Error())
 			return
 		}
-		primitive := &djstate.SetPrimitive{
-			Path:  []interface{}{},
-			Value: doc.State.Export(),
-		}
-		ns.Emit("primitive", wrap_primitive(primitive))
 	})
 
 	http.ListenAndServe(":3001", sio)
