@@ -20,6 +20,13 @@ func get_document(c *deje.DEJEController, ns *socketio.NameSpace) (*djlogic.Docu
 	doc := sub.(*Subscription).Document
 	return &doc, nil
 }
+func get_sub(c *deje.DEJEController, ns *socketio.NameSpace) (*Subscription, error) {
+	sub, ok := ns.Session.Values["subscription"]
+	if !ok {
+		return nil, errors.New("Not subscribed yet, cannot publish events")
+	}
+	return sub.(*Subscription), nil
+}
 
 func Run(controller *deje.DEJEController) {
 	sock_config := &socketio.Config{}
@@ -53,8 +60,8 @@ func Run(controller *deje.DEJEController) {
 		sub.SendState(ns)
 	})
 	sio.On("event", func(ns *socketio.NameSpace, evstr string) {
-		log.Printf("Incoming event: %s", evstr)
-		doc, err := get_document(controller, ns)
+		//log.Printf("Incoming event: %s", evstr)
+		sub, err := get_sub(controller, ns)
 		if err != nil {
 			ns.Emit("error", err.Error())
 			return
@@ -69,7 +76,9 @@ func Run(controller *deje.DEJEController) {
 			return
 		}
 
-		doc.Events.Register(event)
+		sub.Document.Events.Register(event)
+		sub.PConn.PublishEvent(event)
+		sub.PConn.Channel.Outgoing <- "Some bullshit"
 		ns.Emit("event_registered", event.Hash())
 	})
 	sio.On("stats_request", func(ns *socketio.NameSpace) {

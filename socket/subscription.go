@@ -5,10 +5,12 @@ import (
 	djbroad "github.com/campadrenalin/go-deje/broadcast"
 	djlogic "github.com/campadrenalin/go-deje/logic"
 	djmodel "github.com/campadrenalin/go-deje/model"
+	djproto "github.com/campadrenalin/go-deje/protocol"
 	djserv "github.com/campadrenalin/go-deje/services"
 	djstate "github.com/campadrenalin/go-deje/state"
 	"github.com/googollee/go-socket.io"
 	"log"
+	"os"
 )
 
 // A Socket.IO connection may subscribe to a Document, and
@@ -22,6 +24,7 @@ type Subscription struct {
 	Document   djlogic.Document
 	IRC        djserv.IRCChannel
 	Primitives *djbroad.Subscription
+	PConn      djproto.Connection
 	stopper    chan struct{}
 }
 
@@ -32,10 +35,18 @@ func NewSubscription(c *deje.DEJEController, url string) (*Subscription, error) 
 		return nil, err
 	}
 	doc := c.GetDocument(location)
+	pconn := djproto.NewConnection(
+		doc,
+		c.Networker.GetChannel(location),
+	)
+	logger := log.New(os.Stderr, "go-deje pconn: ", 0)
+
+	go pconn.Run(logger)
 	return &Subscription{
 		doc,
 		c.Networker.GetChannel(location),
 		doc.State.Subscribe(),
+		pconn,
 		make(chan struct{}),
 	}, nil
 }

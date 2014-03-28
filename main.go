@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/campadrenalin/deje-admin/socket"
 	"github.com/campadrenalin/go-deje"
+	djserv "github.com/campadrenalin/go-deje/services"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +12,7 @@ import (
 
 func main() {
 	controller := deje.NewDEJEController()
+	controller.Networker = djserv.RealIRCService{}
 
 	// Listen for interruptions
 	interrupter := make(chan os.Signal)
